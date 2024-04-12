@@ -147,7 +147,7 @@ country_area %>%
   country_data
 
 country_data %>%
-  write_csv('country_data.csv')
+  write_csv('data/country_data.csv')
  
 # Brings states together ---
 state_area %>%
@@ -156,5 +156,5 @@ state_area %>%
   state_data
 
 state_data %>%
-  write_csv('state_data.csv')
+  write_csv('data/state_data.csv')
 
