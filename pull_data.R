@@ -145,9 +145,16 @@ country_area %>%
   inner_join(country_pop) %>%
   inner_join(country_gdp) ->
   country_data
+
+country_data %>%
+  write_csv('country_data.csv')
  
 # Brings states together ---
 state_area %>%
   inner_join(state_pop) %>%
   inner_join(state_gdp) ->
   state_data
+
+state_data %>%
+  write_csv('state_data.csv')
+
