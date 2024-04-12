@@ -145,7 +145,7 @@ country_area %>%
   inner_join(country_pop) %>%
   inner_join(country_gdp) ->
   country_data
-
+ 
 # Brings states together ---
 state_area %>%
   inner_join(state_pop) %>%
