@@ -82,7 +82,7 @@ page <- read_html(url)
 # Find the correct table. Usually, you'd use the selector or position of the table.
 table <- html_nodes(page, "table") %>% .[[3]]
 country_gdp <- html_table(table, fill = TRUE)
-country_gdp  <- country_gdp[, c(1, 3)][-1,]
+country_gdp  <- country_gdp[, c(1, 3)][-1, ]
 names(country_gdp) <- c('country', 'gdp2022_mill_usd')
 
 country_gdp %>%
@@ -105,7 +105,7 @@ page <- read_html(url)
 # Find the correct table. Usually, you'd use the selector or position of the table.
 table <- html_nodes(page, "table") %>% .[[1]]
 state_area <- html_table(table, fill = TRUE)
-state_area <- state_area[, c(1, 2)][-1,]  
+state_area <- state_area[, c(1, 2)][-1, ]
 names(state_area) <- c('state', 'area_mi2')
 
 state_area %>%
@@ -135,7 +135,7 @@ country_area %>%
   # Split the column into two
   mutate(area_mi2 = str_split_i(area, " ", 2))  %>%
   select(country, area_mi2) %>%
-  mutate(area_mi2 = str_remove_all(area_mi2, "[,()]")) ->
+  mutate(area_mi2 = as.numeric( str_remove_all(area_mi2, "[,()]"))) ->
   country_area
 
 
@@ -148,7 +148,7 @@ country_area %>%
 
 country_data %>%
   write_csv('data/country_data.csv')
- 
+
 # Brings states together ---
 state_area %>%
   inner_join(state_pop) %>%
@@ -158,3 +158,26 @@ state_area %>%
 state_data %>%
   write_csv('data/state_data.csv')
 
+country_data %>%
+  arrange(pop2023) %>%
+  filter(country == 'Sweden') %>%
+  select(-country) ->
+  ref
+
+
+
+# diffs --------------------
+
+
+closest_states <- state_data %>%
+  mutate(
+    area_diff = abs((area_mi2 - ref$area_mi2[1]) / ref$area_mi2[1]),
+    pop_diff = abs((pop2023 - ref$pop2023[1]) / ref$pop2023[1]),
+    gdp_diff = abs((gdp2022_mill_usd - ref$gdp2022_mill_usd[1]) / ref$gdp2022_mill_usd[1]),
+    total_diff = area_diff + pop_diff + gdp_diff
+  ) %>%
+  arrange(total_diff) %>%
+  select(state, total_diff)
+
+# View the sorted states
+closest_states
