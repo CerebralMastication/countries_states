@@ -135,7 +135,7 @@ country_area %>%
   # Split the column into two
   mutate(area_mi2 = str_split_i(area, " ", 2))  %>%
   select(country, area_mi2) %>%
-  mutate(area_mi2 = as.numeric( str_remove_all(area_mi2, "[,()]"))) ->
+  mutate(area_mi2 = as.numeric(str_remove_all(area_mi2, "[,()]"))) ->
   country_area
 
 
@@ -158,26 +158,22 @@ state_area %>%
 state_data %>%
   write_csv('data/state_data.csv')
 
+
+## test differences -----
 country_data %>%
   arrange(pop2023) %>%
-  filter(country == 'Sweden') %>%
+  filter(country == 'Ireland') %>%
   select(-country) ->
   ref
 
-
-
 # diffs --------------------
 
-
-closest_states <- state_data %>%
+state_data %>%
   mutate(
-    area_diff = abs((area_mi2 - ref$area_mi2[1]) / ref$area_mi2[1]),
-    pop_diff = abs((pop2023 - ref$pop2023[1]) / ref$pop2023[1]),
-    gdp_diff = abs((gdp2022_mill_usd - ref$gdp2022_mill_usd[1]) / ref$gdp2022_mill_usd[1]),
-    total_diff = area_diff + pop_diff + gdp_diff
+    area_diff = ((area_mi2 - ref$area_mi2[1]) / ref$area_mi2[1]),
+    pop_diff = ((pop2023 - ref$pop2023[1]) / ref$pop2023[1]),
+    gdp_diff = ((gdp2022_mill_usd - ref$gdp2022_mill_usd[1]) / ref$gdp2022_mill_usd[1]
+    ),
+    total_diff = abs(area_diff) + (abs(pop_diff) + abs(gdp_diff))
   ) %>%
-  arrange(total_diff) %>%
-  select(state, total_diff)
-
-# View the sorted states
-closest_states
+  arrange(total_diff)  
